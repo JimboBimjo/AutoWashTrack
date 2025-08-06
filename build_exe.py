@@ -32,22 +32,24 @@ def install_pyinstaller():
 
 def check_files():
     """Check if required files exist"""
-    required_files = ['carwash_app.py']
-    
-    for file in required_files:
-        if not os.path.exists(file):
-            print(f"✗ Required file missing: {file}")
-            return False
-    
-    print("✓ All required files found")
-    return True
+    # Prefer compatible version for Python 3.13
+    if os.path.exists('carwash_app_compatible.py'):
+        print("✓ Using Python 3.13 compatible version")
+        return True, 'carwash_app_compatible.py'
+    elif os.path.exists('carwash_app.py'):
+        print("✓ Using original version (may have Python 3.13 compatibility issues)")
+        return True, 'carwash_app.py'
+    else:
+        print("✗ No carwash application files found")
+        print("  Looking for: carwash_app_compatible.py or carwash_app.py")
+        return False, None
 
-def create_spec_file():
+def create_spec_file(main_file):
     """Create PyInstaller spec file for customization"""
-    spec_content = '''# -*- mode: python ; coding: utf-8 -*-
+    spec_content = f'''# -*- mode: python ; coding: utf-8 -*-
 
 a = Analysis(
-    ['carwash_app.py'],
+    ['{main_file}'],
     pathex=[],
     binaries=[],
     datas=[],

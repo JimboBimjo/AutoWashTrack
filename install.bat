@@ -85,15 +85,20 @@ echo   OR
 echo   2. Open command prompt and run: python carwash_app.py
 echo.
 
-REM Create run script
+REM Create run script with compatibility version
 echo @echo off > run_carwash.bat
 echo echo Starting Carwash Management System... >> run_carwash.bat
-echo %PYTHON_CMD% carwash_app.py >> run_carwash.bat
+echo echo Using Python 3.13 compatible version... >> run_carwash.bat
+echo %PYTHON_CMD% carwash_app_compatible.py >> run_carwash.bat
 echo if errorlevel 1 ( >> run_carwash.bat
 echo     echo. >> run_carwash.bat
 echo     echo Error: Application failed to start >> run_carwash.bat
-echo     echo Please check that Python and openpyxl are installed >> run_carwash.bat
-echo     echo. >> run_carwash.bat
+echo     echo Trying original version... >> run_carwash.bat
+echo     %PYTHON_CMD% carwash_app.py >> run_carwash.bat
+echo     if errorlevel 1 ( >> run_carwash.bat
+echo         echo Please check that Python and openpyxl are installed >> run_carwash.bat
+echo         echo Or try running: python carwash_app_compatible.py >> run_carwash.bat
+echo     ^) >> run_carwash.bat
 echo ^) >> run_carwash.bat
 echo pause >> run_carwash.bat
 

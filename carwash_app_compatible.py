@@ -484,7 +484,7 @@ class CarwashApp:
         filename = filedialog.asksaveasfilename(
             defaultextension=".xlsx",
             filetypes=[("Excel files", "*.xlsx")],
-            initialname=f"carwash_report_{today.strftime('%Y-%m-%d')}.xlsx"
+            initialfile=f"carwash_report_{today.strftime('%Y-%m-%d')}.xlsx"
         )
         
         if not filename:
@@ -577,7 +577,7 @@ class CarwashApp:
         filename = filedialog.asksaveasfilename(
             defaultextension=".csv",
             filetypes=[("CSV files", "*.csv")],
-            initialname=f"carwash_report_{today.strftime('%Y-%m-%d')}.csv"
+            initialfile=f"carwash_report_{today.strftime('%Y-%m-%d')}.csv"
         )
         
         if not filename:

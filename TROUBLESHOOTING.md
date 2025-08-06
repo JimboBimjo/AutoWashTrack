@@ -69,10 +69,14 @@ sudo pacman -S tk
 ```
 
 ### Issue: Excel export not working
-**Solution**: Make sure openpyxl is installed:
-```
-python -m pip install openpyxl
-```
+**Solutions**:
+1. Make sure openpyxl is installed:
+   ```
+   python -m pip install openpyxl
+   ```
+2. If you get "bad option -initialname" error (Python 3.13):
+   - This is automatically fixed in the latest version
+   - Download the updated carwash_app.py or carwash_app_compatible.py
 
 ## Application Issues
 
