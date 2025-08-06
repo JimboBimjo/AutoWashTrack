@@ -1,10 +1,12 @@
 import os
 import csv
 import logging
+import uuid
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file, jsonify
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from werkzeug.utils import secure_filename
-import uuid
+from models import db, Car, Employee
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
@@ -16,30 +18,54 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "carwash-secret-key-123")
 
+# Database configuration
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+# Initialize database and SocketIO
+db.init_app(app)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-# In-memory storage
-cars_data = {}  # {car_id: {car_name, plate_number, plate_photo, status, washer_name, timestamp, payment_amount, cashier_name, completion_time}}
-employees = {}  # {session_id: {name, role}}
 
 # Car statuses
 STATUS_WASHING = "washing"
 STATUS_AWAITING_PAYMENT = "awaiting_payment" 
 STATUS_FINISHED = "finished"
 
+# Create tables
+with app.app_context():
+    db.create_all()
+    print("Database tables created successfully")
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_current_employee():
     session_id = session.get('session_id')
-    return employees.get(session_id) if session_id else None
+    if session_id:
+        employee = Employee.query.filter_by(session_id=session_id).first()
+        return employee.to_dict() if employee else None
+    return None
+
+def broadcast_car_update(car_data):
+    """Broadcast car updates to all connected clients"""
+    socketio.emit('car_updated', car_data, room='dashboard')
+
+def broadcast_dashboard_refresh():
+    """Broadcast dashboard refresh to all connected clients"""
+    socketio.emit('dashboard_refresh', room='dashboard')
 
 # Make get_current_employee available in templates
 @app.context_processor
@@ -48,6 +74,25 @@ def inject_current_employee():
 
 def generate_session_id():
     return str(uuid.uuid4())
+
+# SocketIO event handlers
+@socketio.on('connect')
+def handle_connect():
+    print(f'Client connected: {request.sid}')
+    
+@socketio.on('disconnect')
+def handle_disconnect():
+    print(f'Client disconnected: {request.sid}')
+
+@socketio.on('join_dashboard')
+def handle_join_dashboard():
+    join_room('dashboard')
+    print(f'Client {request.sid} joined dashboard room')
+    
+@socketio.on('leave_dashboard')
+def handle_leave_dashboard():
+    leave_room('dashboard')
+    print(f'Client {request.sid} left dashboard room')
 
 @app.route('/')
 def index():
@@ -69,11 +114,15 @@ def login():
         # Create session
         session_id = generate_session_id()
         session['session_id'] = session_id
-        employees[session_id] = {
-            'name': name,
-            'role': role,
-            'login_time': datetime.now()
-        }
+        
+        # Store employee in database
+        employee = Employee(
+            session_id=session_id,
+            name=name,
+            role=role
+        )
+        db.session.add(employee)
+        db.session.commit()
         
         flash(f'Welcome, {name}!', 'success')
         return redirect(url_for('dashboard'))
@@ -83,8 +132,12 @@ def login():
 @app.route('/logout')
 def logout():
     session_id = session.get('session_id')
-    if session_id and session_id in employees:
-        del employees[session_id]
+    if session_id:
+        # Remove employee from database
+        employee = Employee.query.filter_by(session_id=session_id).first()
+        if employee:
+            db.session.delete(employee)
+            db.session.commit()
     session.clear()
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
@@ -96,16 +149,16 @@ def dashboard():
         return redirect(url_for('login'))
     
     # Filter cars by status for dashboard display
-    washing_cars = [car for car in cars_data.values() if car['status'] == STATUS_WASHING]
-    awaiting_payment_cars = [car for car in cars_data.values() if car['status'] == STATUS_AWAITING_PAYMENT]
-    finished_cars = [car for car in cars_data.values() if car['status'] == STATUS_FINISHED]
+    washing_cars = [car.to_dict() for car in Car.query.filter_by(status=STATUS_WASHING).all()]
+    awaiting_payment_cars = [car.to_dict() for car in Car.query.filter_by(status=STATUS_AWAITING_PAYMENT).all()]
+    finished_cars = [car.to_dict() for car in Car.query.filter_by(status=STATUS_FINISHED).all()]
     
     return render_template('dashboard.html', 
                          employee=employee,
                          washing_cars=washing_cars,
                          awaiting_payment_cars=awaiting_payment_cars,
                          finished_cars=finished_cars,
-                         total_cars=len(cars_data))
+                         total_cars=Car.query.count())
 
 @app.route('/add_car', methods=['GET', 'POST'])
 def add_car():
@@ -132,20 +185,19 @@ def add_car():
                 file.save(file_path)
                 plate_photo = filename
         
-        # Create new car entry
-        car_id = str(uuid.uuid4())
-        cars_data[car_id] = {
-            'car_id': car_id,
-            'car_name': car_name,
-            'plate_number': plate_number,
-            'plate_photo': plate_photo,
-            'status': STATUS_WASHING,
-            'washer_name': employee['name'],
-            'timestamp': datetime.now(),
-            'payment_amount': None,
-            'cashier_name': None,
-            'completion_time': None
-        }
+        # Create new car entry in database
+        car = Car(
+            car_name=car_name,
+            plate_number=plate_number,
+            photo_filename=plate_photo,
+            status=STATUS_WASHING,
+            washer_name=employee['name']
+        )
+        db.session.add(car)
+        db.session.commit()
+        
+        # Broadcast update to all connected clients
+        broadcast_car_update(car.to_dict())
         
         flash(f'Car "{car_name}" has been added and is now washing.', 'success')
         return redirect(url_for('dashboard'))

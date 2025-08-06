@@ -1,6 +1,6 @@
 # Overview
 
-A Flask-based carwash management system that tracks vehicles through the washing process from arrival to payment completion. The system supports two types of employees (washers and cashiers) and manages car statuses through a simple workflow: washing → awaiting payment → finished. Features include license plate photo capture, real-time dashboard views, daily data export functionality (Excel and CSV), and daily reset capabilities. Uses Philippine Peso (₱) currency.
+A Flask-based carwash management system with real-time synchronization that tracks vehicles through the washing process from arrival to payment completion. The system supports two types of employees (washers and cashiers) and manages car statuses through a simple workflow: washing → awaiting payment → finished. Features include license plate photo capture, real-time dashboard views across multiple devices, daily data export functionality (Excel and CSV), PostgreSQL database storage, and daily reset capabilities. Uses Philippine Peso (₱) currency with WebSocket connections for instant updates when any device makes changes.
 
 # User Preferences
 
@@ -21,11 +21,11 @@ Preferred communication style: Simple, everyday language.
 - **Mobile-optimized**: Responsive navigation, touch-friendly buttons, floating action button for quick access
 
 ## Data Storage
-- **In-memory dictionaries**: Two main data structures:
-  - `cars_data`: Stores car information, status, timestamps, and payment details
+- **PostgreSQL Database**: Persistent storage with two main tables:
+  - `cars`: Stores car information, status, timestamps, and payment details
   - `employees`: Stores active employee sessions with names and roles
 - **File system**: License plate photos stored in `uploads/` directory
-- **No persistent database**: Data resets on application restart (suitable for daily operations)
+- **Real-time synchronization**: WebSocket connections for live updates across devices
 
 ## Authentication & Authorization
 - **UUID-based sessions**: Each employee gets a unique session ID
@@ -48,6 +48,10 @@ Preferred communication style: Simple, everyday language.
 - **Bootstrap 5**: UI framework via CDN
 - **Font Awesome 6**: Icon library via CDN  
 - **Flask**: Core web framework
+- **Flask-SocketIO**: Real-time WebSocket communication
+- **PostgreSQL**: Database for persistent storage
+- **SQLAlchemy**: Database ORM and migrations
 - **Werkzeug**: File upload utilities and security helpers
 - **openpyxl**: Excel file generation and formatting
+- **Socket.IO**: Client-side real-time communication
 - **Python standard library**: CSV, datetime, UUID, logging, and OS modules
