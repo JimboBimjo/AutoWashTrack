@@ -265,6 +265,14 @@ def export_daily_data():
     
     return send_file(csv_path, as_attachment=True, download_name=csv_filename)
 
+@app.route('/manifest.json')
+def manifest():
+    return send_file('templates/manifest.json', mimetype='application/json')
+
+@app.route('/sw.js')
+def service_worker():
+    return send_file('static/sw.js', mimetype='application/javascript')
+
 @app.route('/export_daily_excel')
 def export_daily_excel():
     employee = get_current_employee()

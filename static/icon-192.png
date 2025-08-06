@@ -1,0 +1,11 @@
+<svg width="192" height="192" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" fill="#0d6efd"/>
+  <rect x="38" y="77" width="115" height="58" fill="white" rx="5"/>
+  <circle cx="58" cy="125" r="15" fill="#333"/>
+  <circle cx="134" cy="125" r="15" fill="#333"/>
+  <circle cx="38" cy="29" r="12" fill="#17a2b8"/>
+  <circle cx="154" cy="38" r="12" fill="#17a2b8"/>
+  <circle cx="58" cy="154" r="12" fill="#17a2b8"/>
+  <circle cx="134" cy="144" r="12" fill="#17a2b8"/>
+  <text x="96" y="50" text-anchor="middle" fill="white" font-size="24" font-weight="bold">🚗</text>
+</svg>

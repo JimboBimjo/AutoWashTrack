@@ -1,5 +1,25 @@
 // Carwash Management System JavaScript
 
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+            .then(function(registration) {
+                console.log('SW registered');
+            })
+            .catch(function(registrationError) {
+                console.log('SW registration failed');
+            });
+    });
+}
+
+// PWA Install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    deferredPrompt = e;
+    // Show install button if you want
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize tooltips if Bootstrap is available
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
