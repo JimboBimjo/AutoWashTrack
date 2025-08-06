@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Carwash Management Desktop Application
+Carwash Management Desktop Application - Python 3.13 Compatible Version
 A standalone desktop app for managing carwash operations with car tracking and payment processing.
+Fixed compatibility issues with newer Python versions.
 """
 
 import tkinter as tk
@@ -84,32 +85,49 @@ class CarwashApp:
         """Create the login interface"""
         self.clear_screen()
         
+        # Configure root window style
+        self.root.configure(bg='#f0f0f0')
+        
         # Main frame
         login_frame = ttk.Frame(self.root, padding="50")
         login_frame.pack(expand=True, fill='both')
         
-        # Title
-        title_label = ttk.Label(login_frame, text="Carwash Management System")
-        title_label.pack(pady=30)
+        # Title with custom styling
+        title_frame = ttk.Frame(login_frame)
+        title_frame.pack(pady=30)
+        
+        title_label = tk.Label(title_frame, text="Carwash Management System", 
+                              font=('Arial', 24, 'bold'), 
+                              bg='#f0f0f0', fg='#2c3e50')
+        title_label.pack()
         
         # Employee name
-        name_label = ttk.Label(login_frame, text="Employee Name:")
+        name_label = tk.Label(login_frame, text="Employee Name:", 
+                             font=('Arial', 12), bg='#f0f0f0', fg='#34495e')
         name_label.pack(pady=5)
-        self.name_entry = ttk.Entry(login_frame, width=30)
+        
+        self.name_entry = ttk.Entry(login_frame, width=30, font=('Arial', 12))
         self.name_entry.pack(pady=5)
         
         # Role selection
-        role_label = ttk.Label(login_frame, text="Role:")
+        role_label = tk.Label(login_frame, text="Role:", 
+                             font=('Arial', 12), bg='#f0f0f0', fg='#34495e')
         role_label.pack(pady=(20, 5))
+        
         self.role_var = tk.StringVar(value="washer")
         
         role_frame = ttk.Frame(login_frame)
         role_frame.pack(pady=5)
         
-        washer_radio = ttk.Radiobutton(role_frame, text="Washer", variable=self.role_var, value="washer")
+        # Use regular radiobuttons to avoid ttk font issues
+        washer_radio = tk.Radiobutton(role_frame, text="Washer", variable=self.role_var, 
+                                     value="washer", font=('Arial', 12),
+                                     bg='#f0f0f0', fg='#34495e', selectcolor='#3498db')
         washer_radio.pack(side='left', padx=20)
         
-        cashier_radio = ttk.Radiobutton(role_frame, text="Cashier", variable=self.role_var, value="cashier")
+        cashier_radio = tk.Radiobutton(role_frame, text="Cashier", variable=self.role_var, 
+                                      value="cashier", font=('Arial', 12),
+                                      bg='#f0f0f0', fg='#34495e', selectcolor='#3498db')
         cashier_radio.pack(side='left', padx=20)
         
         # Login button
@@ -138,6 +156,9 @@ class CarwashApp:
         """Create the main dashboard interface"""
         self.clear_screen()
         
+        # Reset background
+        self.root.configure(bg='SystemButtonFace')
+        
         # Main container
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.pack(expand=True, fill='both')
@@ -146,7 +167,9 @@ class CarwashApp:
         header_frame = ttk.Frame(main_frame)
         header_frame.pack(fill='x', pady=(0, 10))
         
-        header_label = ttk.Label(header_frame, text=f"Dashboard - {self.current_employee['name']} ({self.current_employee['role'].title()})")
+        header_text = f"Dashboard - {self.current_employee['name']} ({self.current_employee['role'].title()})"
+        header_label = tk.Label(header_frame, text=header_text, 
+                               font=('Arial', 16, 'bold'), fg='#2c3e50')
         header_label.pack(side='left')
         
         # Buttons frame
@@ -188,7 +211,9 @@ class CarwashApp:
         # Status bar
         self.status_var = tk.StringVar()
         self.update_status()
-        status_bar = ttk.Label(main_frame, textvariable=self.status_var, relief='sunken')
+        status_bar = tk.Label(main_frame, textvariable=self.status_var, 
+                             relief='sunken', font=('Arial', 10),
+                             anchor='w', padx=10)
         status_bar.pack(fill='x', side='bottom')
         
         # Auto-refresh every 5 seconds
@@ -278,22 +303,28 @@ class CarwashApp:
         # Create payment dialog
         dialog = tk.Toplevel(self.root)
         dialog.title("Process Payment")
-        dialog.geometry("400x200")
+        dialog.geometry("400x250")
         dialog.transient(self.root)
         dialog.grab_set()
+        dialog.configure(bg='#f0f0f0')
         
         car_data = self.cars_data[car_id]
         
-        # Car info
-        car_label = ttk.Label(dialog, text=f"Car: {car_data['car_name']}")
+        # Car info with better styling
+        car_label = tk.Label(dialog, text=f"Car: {car_data['car_name']}", 
+                            font=('Arial', 14, 'bold'), bg='#f0f0f0', fg='#2c3e50')
         car_label.pack(pady=10)
-        plate_label = ttk.Label(dialog, text=f"Plate: {car_data['plate_number']}")
+        
+        plate_label = tk.Label(dialog, text=f"Plate: {car_data['plate_number']}", 
+                              font=('Arial', 11), bg='#f0f0f0', fg='#34495e')
         plate_label.pack()
         
         # Payment amount
-        amount_label = ttk.Label(dialog, text="Payment Amount (₱):")
+        amount_label = tk.Label(dialog, text="Payment Amount (₱):", 
+                               font=('Arial', 12), bg='#f0f0f0', fg='#34495e')
         amount_label.pack(pady=(20, 5))
-        payment_entry = ttk.Entry(dialog, width=20)
+        
+        payment_entry = ttk.Entry(dialog, width=20, font=('Arial', 12))
         payment_entry.pack(pady=5)
         payment_entry.focus()
         
@@ -332,33 +363,38 @@ class CarwashApp:
         """Show dialog to add a new car"""
         dialog = tk.Toplevel(self.root)
         dialog.title("Add New Car")
-        dialog.geometry("400x300")
+        dialog.geometry("450x350")
         dialog.transient(self.root)
         dialog.grab_set()
+        dialog.configure(bg='#f0f0f0')
         
         # Car name
-        car_name_label = ttk.Label(dialog, text="Car Name:")
+        car_name_label = tk.Label(dialog, text="Car Name:", 
+                                 font=('Arial', 12), bg='#f0f0f0', fg='#34495e')
         car_name_label.pack(pady=5)
-        car_name_entry = ttk.Entry(dialog, width=30)
+        car_name_entry = ttk.Entry(dialog, width=30, font=('Arial', 12))
         car_name_entry.pack(pady=5)
         car_name_entry.focus()
         
         # Plate number
-        plate_label = ttk.Label(dialog, text="Plate Number:")
+        plate_label = tk.Label(dialog, text="Plate Number:", 
+                              font=('Arial', 12), bg='#f0f0f0', fg='#34495e')
         plate_label.pack(pady=5)
-        plate_entry = ttk.Entry(dialog, width=30)
+        plate_entry = ttk.Entry(dialog, width=30, font=('Arial', 12))
         plate_entry.pack(pady=5)
         
         # Photo section
-        photo_label = ttk.Label(dialog, text="License Plate Photo (optional):")
+        photo_label = tk.Label(dialog, text="License Plate Photo (optional):", 
+                              font=('Arial', 12), bg='#f0f0f0', fg='#34495e')
         photo_label.pack(pady=5)
         
         photo_frame = ttk.Frame(dialog)
         photo_frame.pack(pady=5)
         
         photo_path_var = tk.StringVar()
-        photo_label = ttk.Label(photo_frame, textvariable=photo_path_var)
-        photo_label.pack()
+        photo_display = tk.Label(photo_frame, textvariable=photo_path_var, 
+                                font=('Arial', 10), bg='#f0f0f0', fg='#3498db')
+        photo_display.pack()
         
         def browse_photo():
             filename = filedialog.askopenfilename(
@@ -648,12 +684,12 @@ def main():
     """Main application entry point"""
     root = tk.Tk()
     
-    # Configure style
-    style = ttk.Style()
+    # Configure style for better compatibility
     try:
+        style = ttk.Style()
         style.theme_use('clam')
     except:
-        # Fallback to default theme if clam is not available
+        # Use default theme if clam is not available
         pass
     
     app = CarwashApp(root)
