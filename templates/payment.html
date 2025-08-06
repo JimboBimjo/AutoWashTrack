@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
+    <div class="col-12 col-md-8 col-lg-6">
         <div class="card">
             <div class="card-header bg-info">
                 <h5 class="mb-0 text-white">
@@ -58,15 +58,23 @@
                     <div class="row mb-3">
                         <div class="col">
                             <h6>Quick Amount Buttons:</h6>
-                            <div class="d-grid gap-2 d-sm-flex">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" 
-                                        onclick="setAmount(10.00)">$10.00</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" 
-                                        onclick="setAmount(15.00)">$15.00</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" 
-                                        onclick="setAmount(20.00)">$20.00</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" 
-                                        onclick="setAmount(25.00)">$25.00</button>
+                            <div class="row g-2">
+                                <div class="col-6 col-sm-3">
+                                    <button type="button" class="btn btn-outline-secondary w-100" 
+                                            onclick="setAmount(10.00)">$10.00</button>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <button type="button" class="btn btn-outline-secondary w-100" 
+                                            onclick="setAmount(15.00)">$15.00</button>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <button type="button" class="btn btn-outline-secondary w-100" 
+                                            onclick="setAmount(20.00)">$20.00</button>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <button type="button" class="btn btn-outline-secondary w-100" 
+                                            onclick="setAmount(25.00)">$25.00</button>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -47,9 +47,9 @@
 
 /* Mobile responsiveness */
 @media (max-width: 768px) {
-    .container {
-        padding-left: 15px;
-        padding-right: 15px;
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
     
     .card {
@@ -60,9 +60,87 @@
         margin-bottom: 0.5rem;
     }
     
-    /* Stack dashboard cards on mobile */
-    .row > .col-md-3 {
-        margin-bottom: 1rem;
+    /* Mobile-friendly status cards */
+    .card.bg-warning .card-body,
+    .card.bg-info .card-body,
+    .card.bg-success .card-body,
+    .card.bg-secondary .card-body {
+        padding: 0.75rem;
+    }
+    
+    /* Mobile navigation improvements */
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .navbar-nav .nav-link:last-child {
+        border-bottom: none;
+    }
+    
+    /* Mobile button improvements */
+    .btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .btn-sm {
+        font-size: 0.8rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    /* Mobile form improvements */
+    .form-control, .form-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Mobile dashboard header */
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .d-flex.justify-content-between .d-flex {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    /* Mobile car cards */
+    .card .card-body {
+        padding: 0.75rem;
+    }
+    
+    .card .card-title {
+        font-size: 1rem;
+    }
+    
+    .card .card-text {
+        font-size: 0.85rem;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .btn {
+        min-height: 44px; /* iOS accessibility guideline */
+    }
+    
+    .nav-link {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .card {
+        transition: transform 0.1s ease;
+    }
+    
+    .card:active {
+        transform: scale(0.98);
     }
 }
 
@@ -132,4 +210,42 @@
 
 .status-updated {
     animation: statusChange 0.3s ease-in-out;
+}
+
+/* Floating Action Button (Mobile) */
+.fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--bs-success);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.fab:hover, .fab:focus {
+    background-color: var(--bs-success);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.fab:active {
+    transform: scale(0.95);
+}
+
+@media (min-width: 992px) {
+    .fab {
+        display: none;
+    }
 }

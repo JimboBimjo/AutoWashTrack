@@ -2,7 +2,7 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>{% block title %}Carwash Management System{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
@@ -16,44 +16,76 @@
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
+        <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('dashboard') }}">
                 <i class="fas fa-car-wash me-2"></i>
-                Carwash Manager
+                <span class="d-none d-sm-inline">Carwash Manager</span>
+                <span class="d-sm-none">Carwash</span>
             </a>
             
             {% if session.session_id %}
-            <div class="navbar-nav ms-auto">
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user me-1"></i>
-                        {% set employee = get_current_employee() %}
-                        {% if employee %}{{ employee.name }} ({{ employee.role.title() }}){% endif %}
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ url_for('dashboard') }}">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    {% set employee = get_current_employee() %}
+                    
+                    <!-- Mobile menu items -->
+                    <div class="d-lg-none">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
                             <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                        </a></li>
+                        </a>
                         {% if employee and employee.role == 'washer' %}
-                        <li><a class="dropdown-item" href="{{ url_for('add_car') }}">
+                        <a class="nav-link" href="{{ url_for('add_car') }}">
                             <i class="fas fa-plus me-2"></i>Add Car
-                        </a></li>
+                        </a>
                         {% endif %}
-                        <li><a class="dropdown-item" href="{{ url_for('export_daily_data') }}">
+                        <a class="nav-link" href="{{ url_for('export_daily_data') }}">
                             <i class="fas fa-download me-2"></i>Export Data
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                        </a>
+                        <hr class="text-light">
+                        <div class="nav-link text-light">
+                            <i class="fas fa-user me-1"></i>
+                            {% if employee %}{{ employee.name }} ({{ employee.role.title() }}){% endif %}
+                        </div>
+                        <a class="nav-link" href="{{ url_for('logout') }}">
                             <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </a></li>
-                    </ul>
+                        </a>
+                    </div>
+                    
+                    <!-- Desktop dropdown -->
+                    <div class="nav-item dropdown d-none d-lg-block">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>
+                            {% if employee %}{{ employee.name }} ({{ employee.role.title() }}){% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a></li>
+                            {% if employee and employee.role == 'washer' %}
+                            <li><a class="dropdown-item" href="{{ url_for('add_car') }}">
+                                <i class="fas fa-plus me-2"></i>Add Car
+                            </a></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{{ url_for('export_daily_data') }}">
+                                <i class="fas fa-download me-2"></i>Export Data
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             {% endif %}
         </div>
     </nav>
 
-    <main class="container mt-4">
+    <main class="container-fluid px-3 px-md-4 mt-4">
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

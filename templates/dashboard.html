@@ -3,72 +3,80 @@
 {% block title %}Dashboard - Carwash Management{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>
+<div class="d-flex justify-content-between align-items-start flex-column flex-md-row mb-4">
+    <h2 class="mb-3 mb-md-0">
         <i class="fas fa-tachometer-alt me-2"></i>
         Dashboard
     </h2>
     
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 flex-column flex-sm-row w-100 w-md-auto">
         {% if employee.role == 'washer' %}
         <a href="{{ url_for('add_car') }}" class="btn btn-success">
-            <i class="fas fa-plus me-2"></i>Add New Car
+            <i class="fas fa-plus me-2"></i>
+            <span class="d-none d-sm-inline">Add New Car</span>
+            <span class="d-sm-none">Add Car</span>
         </a>
         {% endif %}
         
         <a href="{{ url_for('export_daily_data') }}" class="btn btn-outline-primary">
-            <i class="fas fa-download me-2"></i>Export Daily Data
+            <i class="fas fa-download me-2"></i>
+            <span class="d-none d-sm-inline">Export Daily Data</span>
+            <span class="d-sm-none">Export</span>
         </a>
     </div>
 </div>
 
 <!-- Status Cards -->
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card bg-warning">
-            <div class="card-body text-center">
-                <i class="fas fa-soap fa-2x mb-2"></i>
-                <h3 id="washing-count">{{ washing_cars|length }}</h3>
-                <p class="mb-0">Washing</p>
+<div class="row mb-4 g-3">
+    <div class="col-6 col-md-3">
+        <div class="card bg-warning h-100">
+            <div class="card-body text-center p-3">
+                <i class="fas fa-soap fa-lg mb-2 d-md-block d-none"></i>
+                <i class="fas fa-soap d-md-none"></i>
+                <h4 id="washing-count" class="mb-1">{{ washing_cars|length }}</h4>
+                <p class="mb-0 small">Washing</p>
             </div>
         </div>
     </div>
     
-    <div class="col-md-3">
-        <div class="card bg-info">
-            <div class="card-body text-center">
-                <i class="fas fa-clock fa-2x mb-2"></i>
-                <h3 id="awaiting-payment-count">{{ awaiting_payment_cars|length }}</h3>
-                <p class="mb-0">Awaiting Payment</p>
+    <div class="col-6 col-md-3">
+        <div class="card bg-info h-100">
+            <div class="card-body text-center p-3">
+                <i class="fas fa-clock fa-lg mb-2 d-md-block d-none"></i>
+                <i class="fas fa-clock d-md-none"></i>
+                <h4 id="awaiting-payment-count" class="mb-1">{{ awaiting_payment_cars|length }}</h4>
+                <p class="mb-0 small">Payment</p>
             </div>
         </div>
     </div>
     
-    <div class="col-md-3">
-        <div class="card bg-success">
-            <div class="card-body text-center">
-                <i class="fas fa-check fa-2x mb-2"></i>
-                <h3 id="finished-count">{{ finished_cars|length }}</h3>
-                <p class="mb-0">Finished</p>
+    <div class="col-6 col-md-3">
+        <div class="card bg-success h-100">
+            <div class="card-body text-center p-3">
+                <i class="fas fa-check fa-lg mb-2 d-md-block d-none"></i>
+                <i class="fas fa-check d-md-none"></i>
+                <h4 id="finished-count" class="mb-1">{{ finished_cars|length }}</h4>
+                <p class="mb-0 small">Finished</p>
             </div>
         </div>
     </div>
     
-    <div class="col-md-3">
-        <div class="card bg-secondary">
-            <div class="card-body text-center">
-                <i class="fas fa-car fa-2x mb-2"></i>
-                <h3 id="total-count">{{ total_cars }}</h3>
-                <p class="mb-0">Total Cars</p>
+    <div class="col-6 col-md-3">
+        <div class="card bg-secondary h-100">
+            <div class="card-body text-center p-3">
+                <i class="fas fa-car fa-lg mb-2 d-md-block d-none"></i>
+                <i class="fas fa-car d-md-none"></i>
+                <h4 id="total-count" class="mb-1">{{ total_cars }}</h4>
+                <p class="mb-0 small">Total</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Car Lists -->
-<div class="row">
+<div class="row g-3">
     <!-- Washing Cars -->
-    <div class="col-lg-4 mb-4">
+    <div class="col-12 col-lg-4 mb-4">
         <div class="card">
             <div class="card-header bg-warning">
                 <h5 class="mb-0">
@@ -106,7 +114,7 @@
     </div>
     
     <!-- Awaiting Payment Cars -->
-    <div class="col-lg-4 mb-4">
+    <div class="col-12 col-lg-4 mb-4">
         <div class="card">
             <div class="card-header bg-info">
                 <h5 class="mb-0">
@@ -144,7 +152,7 @@
     </div>
     
     <!-- Finished Cars -->
-    <div class="col-lg-4 mb-4">
+    <div class="col-12 col-lg-4 mb-4">
         <div class="card">
             <div class="card-header bg-success">
                 <h5 class="mb-0">
@@ -201,3 +209,10 @@ setInterval(function() {
 }, 30000);
 </script>
 {% endblock %}
+
+<!-- Floating Action Button for Mobile -->
+{% if employee.role == 'washer' %}
+<a href="{{ url_for('add_car') }}" class="fab d-lg-none" title="Add New Car">
+    <i class="fas fa-plus"></i>
+</a>
+{% endif %}

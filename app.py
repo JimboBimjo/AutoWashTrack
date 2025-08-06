@@ -38,6 +38,11 @@ def get_current_employee():
     session_id = session.get('session_id')
     return employees.get(session_id) if session_id else None
 
+# Make get_current_employee available in templates
+@app.context_processor
+def inject_current_employee():
+    return dict(get_current_employee=get_current_employee)
+
 def generate_session_id():
     return str(uuid.uuid4())
 

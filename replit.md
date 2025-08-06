@@ -15,9 +15,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend Architecture
 - **Server-side rendering**: Flask templates with Jinja2 for dynamic content
-- **Bootstrap 5**: Dark theme UI framework for responsive design
+- **Bootstrap 5**: Dark theme UI framework with mobile-first responsive design
 - **Font Awesome**: Icon library for visual consistency
 - **Vanilla JavaScript**: Basic client-side functionality for form validation and file previews
+- **Mobile-optimized**: Responsive navigation, touch-friendly buttons, floating action button for quick access
 
 ## Data Storage
 - **In-memory dictionaries**: Two main data structures:
