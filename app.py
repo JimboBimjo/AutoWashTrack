@@ -210,7 +210,7 @@ def payment(car_id):
             car['cashier_name'] = employee['name']
             car['completion_time'] = datetime.now()
             
-            flash(f'Payment of ${payment_amount:.2f} processed for car "{car["car_name"]}".', 'success')
+            flash(f'Payment of ₱{payment_amount:.2f} processed for car "{car["car_name"]}".', 'success')
             return redirect(url_for('dashboard'))
             
         except ValueError:
@@ -255,7 +255,7 @@ def export_daily_data():
                 'Plate Number': car['plate_number'],
                 'Washer': car['washer_name'],
                 'Cashier': car['cashier_name'],
-                'Payment Amount': f"${car['payment_amount']:.2f}" if car['payment_amount'] else '',
+                'Payment Amount': f"₱{car['payment_amount']:.2f}" if car['payment_amount'] else '',
                 'Start Time': car['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
                 'Completion Time': car['completion_time'].strftime('%Y-%m-%d %H:%M:%S') if car['completion_time'] else ''
             })

@@ -166,7 +166,7 @@
                             <p class="card-text">
                                 <small class="text-muted">
                                     Plate: {{ car.plate_number }}<br>
-                                    Payment: ${{ "%.2f"|format(car.payment_amount) if car.payment_amount else 'N/A' }}<br>
+                                    Payment: ₱{{ "%.2f"|format(car.payment_amount) if car.payment_amount else 'N/A' }}<br>
                                     Completed: {{ car.completion_time.strftime('%H:%M') if car.completion_time else 'N/A' }}
                                 </small>
                             </p>
