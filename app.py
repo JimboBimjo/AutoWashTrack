@@ -183,9 +183,9 @@ def update_status(car_id):
 @app.route('/payment/<car_id>', methods=['GET', 'POST'])
 def payment(car_id):
     employee = get_current_employee()
-    if not employee or employee['role'] != 'cashier':
-        flash('Only cashiers can process payments.', 'error')
-        return redirect(url_for('dashboard'))
+    if not employee:
+        flash('Please log in to access this page.', 'error')
+        return redirect(url_for('login'))
     
     if car_id not in cars_data:
         flash('Car not found.', 'error')

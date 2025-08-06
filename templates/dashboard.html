@@ -134,11 +134,9 @@
                                     Finished: {{ car.timestamp.strftime('%H:%M') }}
                                 </small>
                             </p>
-                            {% if employee.role == 'cashier' %}
                             <a href="{{ url_for('payment', car_id=car.car_id) }}" class="btn btn-sm btn-success">
                                 <i class="fas fa-dollar-sign me-1"></i>Process Payment
                             </a>
-                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
