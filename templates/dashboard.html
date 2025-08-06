@@ -18,11 +18,29 @@
         </a>
         {% endif %}
         
-        <a href="{{ url_for('export_daily_data') }}" class="btn btn-outline-primary">
-            <i class="fas fa-download me-2"></i>
-            <span class="d-none d-sm-inline">Export Daily Data</span>
-            <span class="d-sm-none">Export</span>
-        </a>
+        <div class="btn-group" role="group">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="fas fa-download me-2"></i>
+                <span class="d-none d-sm-inline">Export</span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('export_daily_excel') }}">
+                    <i class="fas fa-file-excel me-2"></i>Excel Report
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('export_daily_data') }}">
+                    <i class="fas fa-file-csv me-2"></i>CSV Report
+                </a></li>
+            </ul>
+        </div>
+        
+        <form method="POST" action="{{ url_for('reset_daily_data') }}" class="d-inline" 
+              onsubmit="return confirm('Are you sure you want to reset all daily data? This action cannot be undone.')">
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="fas fa-refresh me-2"></i>
+                <span class="d-none d-sm-inline">Reset Daily Data</span>
+                <span class="d-sm-none">Reset</span>
+            </button>
+        </form>
     </div>
 </div>
 

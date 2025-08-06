@@ -5,6 +5,9 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file, jsonify
 from werkzeug.utils import secure_filename
 import uuid
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Border, Side
+from openpyxl.utils import get_column_letter
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -261,6 +264,109 @@ def export_daily_data():
             })
     
     return send_file(csv_path, as_attachment=True, download_name=csv_filename)
+
+@app.route('/export_daily_excel')
+def export_daily_excel():
+    employee = get_current_employee()
+    if not employee:
+        return redirect(url_for('login'))
+    
+    # Get today's date
+    today = datetime.now().date()
+    
+    # Filter finished cars from today
+    finished_today = []
+    for car in cars_data.values():
+        if (car['status'] == STATUS_FINISHED and 
+            car['completion_time'] and 
+            car['completion_time'].date() == today):
+            finished_today.append(car)
+    
+    if not finished_today:
+        flash('No completed cars found for today.', 'info')
+        return redirect(url_for('dashboard'))
+    
+    # Create Excel workbook
+    wb = Workbook()
+    ws = wb.active
+    ws.title = f"Carwash Report {today.strftime('%Y-%m-%d')}"
+    
+    # Define styles
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # Headers
+    headers = ['Car Name', 'Plate Number', 'Washer', 'Cashier', 'Payment Amount (₱)', 'Start Time', 'Completion Time']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.border = border
+    
+    # Data rows
+    total_payment = 0
+    for row, car in enumerate(finished_today, 2):
+        data = [
+            car['car_name'],
+            car['plate_number'],
+            car['washer_name'],
+            car['cashier_name'] or employee['name'],
+            car['payment_amount'] if car['payment_amount'] else 0,
+            car['timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
+            car['completion_time'].strftime('%Y-%m-%d %H:%M:%S') if car['completion_time'] else ''
+        ]
+        
+        for col, value in enumerate(data, 1):
+            cell = ws.cell(row=row, column=col, value=value)
+            cell.border = border
+        
+        if car['payment_amount']:
+            total_payment += car['payment_amount']
+    
+    # Summary row
+    summary_row = len(finished_today) + 3
+    ws.cell(row=summary_row, column=1, value="TOTAL CARS:").font = Font(bold=True)
+    ws.cell(row=summary_row, column=2, value=len(finished_today)).font = Font(bold=True)
+    ws.cell(row=summary_row + 1, column=1, value="TOTAL REVENUE:").font = Font(bold=True)
+    ws.cell(row=summary_row + 1, column=2, value=f"₱{total_payment:.2f}").font = Font(bold=True)
+    
+    # Auto-adjust column widths
+    for col in range(1, len(headers) + 1):
+        column_letter = get_column_letter(col)
+        max_length = 0
+        for row in range(1, len(finished_today) + 2):
+            cell_value = str(ws[f"{column_letter}{row}"].value)
+            max_length = max(max_length, len(cell_value))
+        ws.column_dimensions[column_letter].width = min(max_length + 2, 30)
+    
+    # Save file
+    excel_filename = f"carwash_daily_report_{today.strftime('%Y-%m-%d')}.xlsx"
+    excel_path = os.path.join(app.config['UPLOAD_FOLDER'], excel_filename)
+    wb.save(excel_path)
+    
+    return send_file(excel_path, as_attachment=True, download_name=excel_filename)
+
+@app.route('/reset_daily_data', methods=['POST'])
+def reset_daily_data():
+    employee = get_current_employee()
+    if not employee:
+        return redirect(url_for('login'))
+    
+    # Count cars that will be reset
+    total_cars = len(cars_data)
+    finished_cars = len([car for car in cars_data.values() if car['status'] == STATUS_FINISHED])
+    
+    # Clear all car data
+    cars_data.clear()
+    
+    flash(f'Daily data reset completed. Cleared {total_cars} cars ({finished_cars} finished cars).', 'success')
+    return redirect(url_for('dashboard'))
 
 @app.route('/api/dashboard_data')
 def api_dashboard_data():

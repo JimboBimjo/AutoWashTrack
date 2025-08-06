@@ -1,6 +1,6 @@
 # Overview
 
-A Flask-based carwash management system that tracks vehicles through the washing process from arrival to payment completion. The system supports two types of employees (washers and cashiers) and manages car statuses through a simple workflow: washing → awaiting payment → finished. Features include license plate photo capture, real-time dashboard views, and daily data export functionality.
+A Flask-based carwash management system that tracks vehicles through the washing process from arrival to payment completion. The system supports two types of employees (washers and cashiers) and manages car statuses through a simple workflow: washing → awaiting payment → finished. Features include license plate photo capture, real-time dashboard views, daily data export functionality (Excel and CSV), and daily reset capabilities. Uses Philippine Peso (₱) currency.
 
 # User Preferences
 
@@ -39,12 +39,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Business Logic Flow
 - **Three-state workflow**: washing → awaiting_payment → finished
-- **Role permissions**: Washers can add cars and update status, cashiers can process payments
-- **Data export**: CSV export functionality for daily reporting
+- **Role permissions**: Both washers and cashiers can add cars, update status, and process payments
+- **Data export**: Excel (.xlsx) and CSV export functionality for daily reporting with totals and revenue
+- **Daily reset**: Clear all car data at end of business day
+- **Currency**: Philippine Peso (₱) with appropriate pricing for carwash services
 
 ## External Dependencies
 - **Bootstrap 5**: UI framework via CDN
 - **Font Awesome 6**: Icon library via CDN  
 - **Flask**: Core web framework
 - **Werkzeug**: File upload utilities and security helpers
+- **openpyxl**: Excel file generation and formatting
 - **Python standard library**: CSV, datetime, UUID, logging, and OS modules
