@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Carwash Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        <i class="fas fa-tachometer-alt me-2"></i>
+        Dashboard
+    </h2>
+    
+    <div class="d-flex gap-2">
+        {% if employee.role == 'washer' %}
+        <a href="{{ url_for('add_car') }}" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Add New Car
+        </a>
+        {% endif %}
+        
+        <a href="{{ url_for('export_daily_data') }}" class="btn btn-outline-primary">
+            <i class="fas fa-download me-2"></i>Export Daily Data
+        </a>
+    </div>
+</div>
+
+<!-- Status Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-warning">
+            <div class="card-body text-center">
+                <i class="fas fa-soap fa-2x mb-2"></i>
+                <h3 id="washing-count">{{ washing_cars|length }}</h3>
+                <p class="mb-0">Washing</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-2x mb-2"></i>
+                <h3 id="awaiting-payment-count">{{ awaiting_payment_cars|length }}</h3>
+                <p class="mb-0">Awaiting Payment</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success">
+            <div class="card-body text-center">
+                <i class="fas fa-check fa-2x mb-2"></i>
+                <h3 id="finished-count">{{ finished_cars|length }}</h3>
+                <p class="mb-0">Finished</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-secondary">
+            <div class="card-body text-center">
+                <i class="fas fa-car fa-2x mb-2"></i>
+                <h3 id="total-count">{{ total_cars }}</h3>
+                <p class="mb-0">Total Cars</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Car Lists -->
+<div class="row">
+    <!-- Washing Cars -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">
+                    <i class="fas fa-soap me-2"></i>Washing ({{ washing_cars|length }})
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if washing_cars %}
+                    {% for car in washing_cars %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ car.car_name }}</h6>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    Plate: {{ car.plate_number }}<br>
+                                    Washer: {{ car.washer_name }}<br>
+                                    Started: {{ car.timestamp.strftime('%H:%M') }}
+                                </small>
+                            </p>
+                            {% if employee.role == 'washer' %}
+                            <a href="{{ url_for('update_status', car_id=car.car_id) }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-arrow-right me-1"></i>Mark Done
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">
+                        <i class="fas fa-inbox me-2"></i>No cars washing
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Awaiting Payment Cars -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>Awaiting Payment ({{ awaiting_payment_cars|length }})
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if awaiting_payment_cars %}
+                    {% for car in awaiting_payment_cars %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ car.car_name }}</h6>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    Plate: {{ car.plate_number }}<br>
+                                    Washer: {{ car.washer_name }}<br>
+                                    Finished: {{ car.timestamp.strftime('%H:%M') }}
+                                </small>
+                            </p>
+                            {% if employee.role == 'cashier' %}
+                            <a href="{{ url_for('payment', car_id=car.car_id) }}" class="btn btn-sm btn-success">
+                                <i class="fas fa-dollar-sign me-1"></i>Process Payment
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">
+                        <i class="fas fa-inbox me-2"></i>No cars awaiting payment
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Finished Cars -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header bg-success">
+                <h5 class="mb-0">
+                    <i class="fas fa-check me-2"></i>Finished Today ({{ finished_cars|length }})
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if finished_cars %}
+                    {% for car in finished_cars[-10:] %}
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ car.car_name }}</h6>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    Plate: {{ car.plate_number }}<br>
+                                    Payment: ${{ "%.2f"|format(car.payment_amount) if car.payment_amount else 'N/A' }}<br>
+                                    Completed: {{ car.completion_time.strftime('%H:%M') if car.completion_time else 'N/A' }}
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% if finished_cars|length > 10 %}
+                    <p class="text-center text-muted">
+                        <small>Showing last 10 cars</small>
+                    </p>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted text-center">
+                        <i class="fas fa-inbox me-2"></i>No finished cars today
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh dashboard data every 30 seconds
+setInterval(function() {
+    fetch('/api/dashboard_data')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.error) {
+                document.getElementById('washing-count').textContent = data.washing_count;
+                document.getElementById('awaiting-payment-count').textContent = data.awaiting_payment_count;
+                document.getElementById('finished-count').textContent = data.finished_count;
+                document.getElementById('total-count').textContent = data.total_count;
+            }
+        })
+        .catch(error => console.log('Dashboard refresh error:', error));
+}, 30000);
+</script>
+{% endblock %}

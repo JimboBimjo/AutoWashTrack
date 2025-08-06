@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Update Car Status - Carwash Management{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>Update Car Status
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Car Info Display -->
+                <div class="card mb-4 bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-car me-2"></i>{{ car.car_name }}
+                        </h6>
+                        <p class="card-text">
+                            <strong>Plate Number:</strong> {{ car.plate_number }}<br>
+                            <strong>Current Status:</strong> 
+                            <span class="badge bg-warning">
+                                <i class="fas fa-soap me-1"></i>Washing
+                            </span><br>
+                            <strong>Started:</strong> {{ car.timestamp.strftime('%Y-%m-%d %H:%M') }}<br>
+                            <strong>Washer:</strong> {{ car.washer_name }}
+                        </p>
+                        
+                        {% if car.plate_photo %}
+                        <div class="mt-2">
+                            <strong>License Plate Photo:</strong><br>
+                            <img src="{{ url_for('static', filename='../uploads/' + car.plate_photo) }}" 
+                                 alt="License plate photo" class="img-thumbnail mt-2" style="max-width: 200px;">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <form method="POST">
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-arrow-right me-2"></i>Update Status
+                        </label>
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="status" value="awaiting_payment" class="btn btn-info">
+                                <i class="fas fa-clock me-2"></i>Mark as Awaiting Payment
+                            </button>
+                            <button type="submit" name="status" value="washing" class="btn btn-warning">
+                                <i class="fas fa-soap me-2"></i>Keep Washing (Reset Timer)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body bg-light">
+                <h6><i class="fas fa-info-circle me-2"></i>Status Update Info:</h6>
+                <ul class="mb-0 small">
+                    <li><strong>Awaiting Payment:</strong> Car is clean and ready for the cashier</li>
+                    <li><strong>Keep Washing:</strong> Car needs more time or you want to reset the timer</li>
+                    <li>Once marked as "Awaiting Payment", the cashier will be notified</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
