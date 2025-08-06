@@ -21,32 +21,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize real-time synchronization if Socket.IO is available
-    if (typeof io !== 'undefined') {
-        const socket = io();
-        
-        socket.on('connect', function() {
-            console.log('Connected for real-time updates');
-            socket.emit('join_dashboard');
-        });
-        
-        socket.on('car_updated', function(carData) {
-            console.log('Car updated:', carData);
-            if (window.location.pathname === '/dashboard') {
-                setTimeout(() => location.reload(), 500);
-            }
-        });
-        
-        socket.on('dashboard_refresh', function() {
-            if (window.location.pathname === '/dashboard') {
-                setTimeout(() => location.reload(), 500);
-            }
-        });
-        
-        window.addEventListener('beforeunload', function() {
-            socket.emit('leave_dashboard');
-        });
-    }
+    // Simple web-based functionality - no real-time features needed
     
     // Initialize tooltips if Bootstrap is available
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

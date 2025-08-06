@@ -4,7 +4,7 @@ import logging
 import uuid
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file, jsonify
-from flask_socketio import SocketIO, emit, join_room, leave_room
+# Removed SocketIO for simpler approach
 from werkzeug.utils import secure_filename
 from models import db, Car, Employee
 from openpyxl import Workbook
@@ -32,9 +32,8 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Initialize database and SocketIO
+# Initialize database
 db.init_app(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Ensure upload directory exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -59,13 +58,7 @@ def get_current_employee():
         return employee.to_dict() if employee else None
     return None
 
-def broadcast_car_update(car_data):
-    """Broadcast car updates to all connected clients"""
-    socketio.emit('car_updated', car_data, room='dashboard')
-
-def broadcast_dashboard_refresh():
-    """Broadcast dashboard refresh to all connected clients"""
-    socketio.emit('dashboard_refresh', room='dashboard')
+# Removed real-time broadcasting for simplified web approach
 
 # Make get_current_employee available in templates
 @app.context_processor
@@ -75,24 +68,7 @@ def inject_current_employee():
 def generate_session_id():
     return str(uuid.uuid4())
 
-# SocketIO event handlers
-@socketio.on('connect')
-def handle_connect():
-    print(f'Client connected: {request.sid}')
-    
-@socketio.on('disconnect')
-def handle_disconnect():
-    print(f'Client disconnected: {request.sid}')
-
-@socketio.on('join_dashboard')
-def handle_join_dashboard():
-    join_room('dashboard')
-    print(f'Client {request.sid} joined dashboard room')
-    
-@socketio.on('leave_dashboard')
-def handle_leave_dashboard():
-    leave_room('dashboard')
-    print(f'Client {request.sid} left dashboard room')
+# Simplified web-based carwash management
 
 @app.route('/')
 def index():
@@ -196,8 +172,7 @@ def add_car():
         db.session.add(car)
         db.session.commit()
         
-        # Broadcast update to all connected clients
-        broadcast_car_update(car.to_dict())
+        # Car added successfully to database
         
         flash(f'Car "{car_name}" has been added and is now washing.', 'success')
         return redirect(url_for('dashboard'))
